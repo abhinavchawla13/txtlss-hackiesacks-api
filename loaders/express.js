@@ -6,7 +6,7 @@ let config = require("../config/config");
 const morgan = require("morgan");
 const { errors } = require("celebrate");
 
-module.exports = app => {
+module.exports = (app) => {
   /**
    * Health Check endpoints
    */
@@ -15,7 +15,11 @@ module.exports = app => {
   });
 
   app.get("/", (req, res) => {
-    res.status(200).send(`Welcome to GitHub Monetization Project's API 😀 [environment: ${config.heroku_env}, build: ${config.node_env}]`);
+    res
+      .status(200)
+      .send(
+        `Welcome to hackiesacks txtlss API 😀 [environment: ${config.heroku_env}, build: ${config.node_env}]`
+      );
   });
 
   // Useful if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
@@ -33,7 +37,7 @@ module.exports = app => {
   // Middleware that transforms the raw string of req.body into json
   app.use(
     bodyParser.urlencoded({
-      extended: true
+      extended: true,
     })
   );
 
@@ -49,21 +53,16 @@ module.exports = app => {
     next(err);
   });
 
-
   /// error handlers
   app.use((err, req, res, next) => {
     /**
      * Handle 401 thrown by express-jwt library
      */
     if (err.name === "UnauthorizedError") {
-      return res
-        .status(err.status)
-        .send({ message: err.message })
-        .end();
+      return res.status(err.status).send({ message: err.message }).end();
     }
     return next(err);
   });
-
 
   app.use(errors());
   app.use((err, req, res, next) => {
@@ -71,8 +70,8 @@ module.exports = app => {
     res.status(err.status || 500);
     res.json({
       errors: {
-        message: err.message
-      }
+        message: err.message,
+      },
     });
   });
 };

@@ -1,5 +1,5 @@
-var watsonService = require("./watson");
+var watson = require("./watson");
 
 module.exports = {
-  transcribe: watsonService.transcribe,
+  transcribe: watson.transcribe,
 };

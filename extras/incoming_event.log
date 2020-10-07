@@ -1,0 +1,25 @@
+{
+  webhook_id: 'd561bc81c6f57c1e341a4ba028967c6d',
+  secret_key: 'ACibNVU9FCEJswPINBaZ5hx5MQ5j7QT2',
+  action: 'incoming_event',
+  payload: {
+    chat_id: 'QHBQ5Q9L8T',
+    thread_id: 'QHYS4L17HM',
+    event: {
+      id: 'QHYS4L17HM_5',
+      custom_id: '',
+      recipients: 'all',
+      created_at: '2020-10-06T18:27:18.970000Z',
+      author_id: 'abhinavchawla13@gmail.com',
+      properties: [Object],
+      type: 'file',
+      name: 'audioclip-1601945230000-5085.mp4',
+      url: 'https://cdn.livechat-files.com/api/file/lc/att/12262749/6e8209b919ca11c3a286cb5e15b2b94c/audioclip-1601945230000-5085.mp4',
+      content_type: 'video/mp4',
+      size: 97620,
+      height: 0,
+      width: 0
+    }
+  },
+  additional_data: {}
+}

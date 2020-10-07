@@ -36,4 +36,6 @@ module.exports = {
   },
   node_env: process.env.NODE_ENV,
   heroku_env: process.env.HEROKU_ENV,
+  livechat_username: process.env.LIVECHAT_USERNAME,
+  livechat_password: process.env.LIVECHAT_PASSWORD,
 };

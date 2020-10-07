@@ -1,0 +1,29 @@
+{
+  event_type: 'chat_started',
+  event_unique_id: 'd6c40a2965ac60df10c1debdd077056d',
+  token: 'd2bd9df20928c9bd7dc24cd2fc4f0ba4',
+  license_id: '12262749',
+  lc_version: '3',
+  chat: {
+    id: 'QHLSNX7OH7',
+    started_timestamp: 1602024055,
+    ended_timestamp: 1602024055,
+    url: '',
+    referer: '',
+    messages: [ [Object] ],
+    attachments: [],
+    events: [],
+    agents: [ [Object] ],
+    tags: [],
+    groups: [ 0 ]
+  },
+  visitor: {
+    id: '9d7471ce-8946-45b4-9152-b607dccd2992',
+    name: 'Abhinav Chawla',
+    country: '',
+    city: '',
+    language: '',
+    page_current: '',
+    timezone: ''
+  }
+}

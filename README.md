@@ -24,6 +24,8 @@ LIVECHAT_WEBHOOK_KEY=
 WATSON_APIKEY=
 ```
 
+Add a `ibm-credentials.env` file in the root folder for automatic watson authentication.
+
 ## Deployment
 
 Heroku pipeline is set to auto deploy `master` branch currently.

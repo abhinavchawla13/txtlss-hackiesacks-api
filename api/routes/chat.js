@@ -2,7 +2,7 @@ let { Router } = require("express");
 let { celebrate, Joi } = require("celebrate");
 const route = Router();
 
-let { webhook, sendEvent } = require("../../controllers/chat");
+let { webhook, sendEvent, watsonTest, watsonTestAudio } = require("../../controllers/chat");
 
 module.exports = (app) => {
   app.use("/chat", route);
@@ -14,4 +14,8 @@ module.exports = (app) => {
 
   // Just for internal testing purposes
   route.post("/send", [sendEvent]);
+
+  // Just for internal testing purposes
+  route.post("/watson", [watsonTest]);
+  route.post("/watsonAudio", [watsonTestAudio]);
 };

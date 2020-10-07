@@ -1,4 +1,5 @@
 const livechat = require("../services/livechat");
+const watson = require("../services/watson");
 const config = require("../config/config");
 const _ = require("lodash");
 const e = require("express");
@@ -58,7 +59,41 @@ async function sendEvent(req, res) {
   }
 }
 
+async function watsonTest(req, res) {
+  try {
+    // const resp = await watson.identifyLanguage(req.body.text, req.query.top && req.query.top.toLowerCase() === 'true' ? true : false);
+    // const resp = await watson.translate(req.body.text, req.body.fromLand, req.body.toLang);
+    // const resp = await watson.transcribe(req.body.audioLink);
+    const resp = await watson.analyzeTone(req.body.text);
+    return res.status(200).json(resp);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json(err);
+  }
+}
+
+// returns audio file
+async function watsonTestAudio(req, res) {
+  try {
+    const fs = require('fs');
+    const filePath = await watson.verbalize(req.body.text);
+    var stat = fs.statSync(filePath);
+    res.writeHead(200, {
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': stat.size
+    });
+    var readStream = fs.createReadStream(filePath);
+    // We replaced all the event handlers with a simple call to readStream.pipe()
+    readStream.pipe(res);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json(err);
+  }
+}
+
 module.exports = {
   webhook,
   sendEvent,
+  watsonTest,
+  watsonTestAudio
 };

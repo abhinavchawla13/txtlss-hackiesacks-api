@@ -9,6 +9,7 @@ const path = require("path");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
+const constants = require("../../constants");
 
 const languageTranslator = new LanguageTranslatorV3({
   authenticator: new IamAuthenticator({ apikey: config.language_translator_api}),
@@ -94,22 +95,25 @@ exports.verbalize = async (text) => {
   return outPath;
 };
 
-exports.transcribe = async (audioLink) => {
+
+exports.transcribe = async (audioLink, lang = 'es') => {
   const audioPath = await audioToWav(audioLink);
   console.log("audioToWav done", audioPath);
   const params = {
     audio: fs.createReadStream(audioPath),
     contentType: "audio/wav",
+    model: constants.watsonLangModels[lang] // spanish (mex)
   };
   const resp = await speechToText.recognize(params);
   if (!resp || !resp.result || !resp.result.results) {
     throw new Error(`Could not transcribe`);
   }
   console.log("transcribe# Text:", JSON.stringify(resp.result.results));
+
   return resp.result;
 };
 
-exports.translate = async (text, sourceLang = "en", toLang = "en") => {
+exports.translate = async (text, sourceLang = "es", toLang = "en") => {
   const resp = await languageTranslator.translate({
     text: [text],
     source: sourceLang,

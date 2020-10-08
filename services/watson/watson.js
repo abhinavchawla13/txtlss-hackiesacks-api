@@ -100,12 +100,14 @@ exports.transcribe = async (audioLink) => {
   const params = {
     audio: fs.createReadStream(audioPath),
     contentType: "audio/wav",
+    model: "es-MX_BroadbandModel" // spanish (mex)
   };
   const resp = await speechToText.recognize(params);
   if (!resp || !resp.result || !resp.result.results) {
     throw new Error(`Could not transcribe`);
   }
   console.log("transcribe# Text:", JSON.stringify(resp.result.results));
+
   return resp.result;
 };
 

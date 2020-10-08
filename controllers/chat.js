@@ -91,12 +91,15 @@ async function webhook(req, res) {
 
         //* translate if needed
         const currentLang = await watson.identifyLanguage(kidMessage);
+        console.log("currentLang", currentLang);
         if (currentLang.language !== "en") {
-          // ! check response
           const translatedKidMessage = await watson.translate(
             kidMessage,
             currentLang.language
           );
+
+          console.log("translatedKidMessage", translatedKidMessage);
+          kidMessage = translatedKidMessage.translations[0].translation;
         }
 
         console.log("kidMessage language: ", currentLang.language);

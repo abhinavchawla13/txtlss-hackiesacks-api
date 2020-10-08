@@ -2,6 +2,7 @@ const LanguageTranslatorV3 = require("ibm-watson/language-translator/v3");
 const SpeechToTextV1 = require("ibm-watson/speech-to-text/v1");
 const TextToSpeechV1 = require("ibm-watson/text-to-speech/v1");
 const ToneAnalyzerV3 = require("ibm-watson/tone-analyzer/v3");
+const { IamAuthenticator } = require("ibm-watson/auth");
 const config = require("../../config/config");
 const fs = require("fs");
 const path = require("path");
@@ -10,18 +11,22 @@ const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const languageTranslator = new LanguageTranslatorV3({
+  authenticator: new IamAuthenticator({ apikey: config.language_translator_api}),
   serviceUrl: config.language_translator_url,
-  version: "2018-05-01",
+  version: "2018-05-01"
 });
 const speechToText = new SpeechToTextV1({
-  serviceUrl: config.speech_to_text_url,
+  authenticator: new IamAuthenticator({ apikey: config.speech_to_text_api}),
+  serviceUrl: config.speech_to_text_url
 });
 const textToSpeech = new TextToSpeechV1({
-  serviceUrl: config.text_to_speech_url,
+  authenticator: new IamAuthenticator({ apikey: config.text_to_speech_api}),
+  serviceUrl: config.text_to_speech_url
 });
 const toneAnalyzer = new ToneAnalyzerV3({
+  authenticator: new IamAuthenticator({ apikey: config.tone_analyzer_api}),
   version: "2016-05-19",
-  serviceUrl: config.tone_analyzer_url,
+  serviceUrl: config.tone_analyzer_url
 });
 
 audioToWav = async (audioLink) => {
@@ -55,10 +60,10 @@ exports.analyzeTone = async (text) => {
     toneInput: text,
     contentType: "text/plain",
   });
-  if (!resp || !resp.result) {
+  if (!resp || !resp.result || !resp.result.document_tone) {
     throw new Error(`Could not analyze tone of ${text}`);
   }
-  console.log("analyzeTone# Tone:", resp.result);
+  console.log("analyzeTone# Tone:", resp.result.document_tone);
   let toneCategories = resp.result.document_tone.tone_categories;
 
   // * filter based on "Emotion Tones"

@@ -44,4 +44,8 @@ module.exports = {
   speech_to_text_url: process.env.SPEECH_TO_TEXT_URL,
   text_to_speech_url: process.env.TEXT_TO_SPEECH_URL,
   tone_analyzer_url: process.env.TONE_ANALYZER_URL,
+  language_translator_api: process.env.LANGUAGE_TRANSLATOR_API,
+  speech_to_text_api: process.env.SPEECH_TO_TEXT_API,
+  text_to_speech_api: process.env.TEXT_TO_SPEECH_API,
+  tone_analyzer_api: process.env.TONE_ANALYZER_API,
 };

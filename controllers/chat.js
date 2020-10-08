@@ -65,7 +65,7 @@ async function webhook(req, res) {
     const chatId = _.get(req, "body.payload.chat_id");
 
     if (!(chatId in currentGames)) {
-      if (kidMessage === "ready" || kidMessage === "start") {
+      if (kidMessage.toLowerCase().includes("ready")) {
         const randomOrder = shuffle(constants.emotions);
         const game = {
           order: randomOrder.slice(0, 3),

@@ -1,1 +1,1 @@
-module.exports = ["fear", "joy", "anger", "sadness"];
+module.exports = ["tentative", "joy", "anger", "sadness"];

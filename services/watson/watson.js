@@ -50,6 +50,7 @@ audioToWav = async (audioLink) => {
 };
 
 exports.analyzeTone = async (text) => {
+  console.log(text);
   const resp = await toneAnalyzer.tone({
     toneInput: text,
     contentType: "text/plain",
@@ -61,14 +62,18 @@ exports.analyzeTone = async (text) => {
   let toneCategories = resp.result.document_tone.tone_categories;
 
   // * filter based on "Emotion Tones"
-  toneCategories = toneCategories.filter(
+  const toneCategories1 = toneCategories.filter(
     (cat) => cat.category_id === "emotion_tone"
   )[0];
+
+  const toneCategories2 = toneCategories.filter(
+    (cat) => cat.category_id === "language_tone"
+  )[0];
+
+  let allTones = [...toneCategories1.tones, ...toneCategories2.tones];
   // * sort by highest scores
-  toneCategories = toneCategories.tones.reduce((a, b) =>
-    a.score > b.score ? a : b
-  );
-  return toneCategories;
+  allTones = allTones.reduce((a, b) => (a.score > b.score ? a : b));
+  return allTones;
 };
 
 exports.verbalize = async (text) => {

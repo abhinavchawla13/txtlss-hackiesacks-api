@@ -18,14 +18,11 @@ async function webhook(req, res) {
       throw new Error("Webhook not received");
     }
 
+    console.log("---------------------------------");
     console.log("req.body.webhook_id", req.body.webhook_id);
     console.log("req.body.action", req.body.action);
-
-    // return res.status(200).send(req.body.action);
-
-    // console.log(req.body.payload.chat_id);
-    // console.log(req.body.payload.thread_id);
-    // return res.send("done");
+    console.log("req.body.payload", req.body.payload);
+    console.log("---------------------------------");
 
     let imageURL = "";
 
@@ -65,7 +62,7 @@ async function webhook(req, res) {
         imageURL = constants.livechatCDNLinks[randomOrder[0]];
       } else {
         // * Watson calls *
-        let kidMessage = "confused";
+        let kidMessage = "";
 
         if (_.get(req, "body.payload.event.type") === "message") {
           kidMessage = _.get(req, "body.payload.event.text");
@@ -106,8 +103,8 @@ async function webhook(req, res) {
 
         const tone = await watson.analyzeTone(kidMessage);
 
-        // * Pick out of 4 emotions: Fear, Joy, Anger, Sadness
-        // * id: fear, joy, anger, sadness
+        // * Pick out of 4 emotions: tentative, Joy, Anger, Sadness
+        // * id: tentative, joy, anger, sadness
         const emotionFromKidMessage = tone.tone_id;
         console.log("emotionFromKidMessage", emotionFromKidMessage);
 

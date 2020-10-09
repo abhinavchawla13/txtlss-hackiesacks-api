@@ -54,8 +54,10 @@ async function webhook(req, res) {
           .alternatives[0].confidence
       ) {
         transcribeResp = transcribeRespEnglish;
+        console.log("English languaged used!");
       } else {
         transcribeResp = transcribeRespSpanish;
+        console.log("Spanish languaged used!");
       }
 
       if (transcribeResp && transcribeResp.results.length > 0) {

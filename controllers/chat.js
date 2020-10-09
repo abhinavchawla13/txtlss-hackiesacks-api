@@ -78,6 +78,8 @@ async function webhook(req, res) {
       throw new Error("Secret key not matching");
     }
 
+    console.log("secret key passed");
+
     if (!req.body.payload.chat_id) {
       throw new Error("No Chat Id");
     }
@@ -86,7 +88,11 @@ async function webhook(req, res) {
     const chatId = _.get(req, "body.payload.chat_id");
 
     if (!(chatId in currentGames)) {
+      console.log("chatId not in currentGames");
+
       if (kidMessage.toLowerCase().includes("ready")) {
+        console.log("in ready state");
+
         const randomOrder = shuffle(constants.emotions);
         const game = {
           order: randomOrder.slice(0, 3),
@@ -98,6 +104,7 @@ async function webhook(req, res) {
         // send first photo
         imageURL = constants.livechatCDNLinks[randomOrder[0] + "_start"];
       } else {
+        console.log("in start game state");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
       }
@@ -107,6 +114,7 @@ async function webhook(req, res) {
       // * Watson calls *
 
       //* translate if needed
+      console.log("translate language", kidMessage);
       const currentLang = await watson.identifyLanguage(kidMessage);
       console.log("currentLang", currentLang);
       if (currentLang.language !== "en") {
@@ -137,6 +145,7 @@ async function webhook(req, res) {
       ) {
         currentGames[chatId]["score"] += 1;
         currentGameWin = true;
+        console.log("current game won");
       }
       console.log("kid score: ", currentGames[chatId]["score"]);
 
@@ -151,6 +160,7 @@ async function webhook(req, res) {
         // remove the game from currentGames
 
         const finalScore = currentGames[chatId]["score"];
+        console.log("finalScore", finalScore);
         if (finalScore === 0) {
           imageURL = constants.livechatCDNLinks["zero"];
         } else if (finalScore === 1) {
@@ -172,7 +182,9 @@ async function webhook(req, res) {
         }
       }
 
+      console.log("send event to LC - start");
       const resp = await livechat.sendEvent(chatId, imageURL);
+      console.log("send event to LC - done");
       if (deactivateChatCheck) {
         await livechat.deactivateChat(chatId);
         deactivateChatCheck = false;

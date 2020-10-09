@@ -35,9 +35,28 @@ async function webhook(req, res) {
       _.get(req, "body.payload.event.content_type") === "video/mp4"
     ) {
       // * Use Watson to transcribe *
-      transcribeResp = await watson.transcribe(
-        _.get(req, "body.payload.event.url")
+      const transcribeRespEnglish = await watson.transcribe(
+        _.get(req, "body.payload.event.url"),
+        "en"
       );
+
+      const transcribeRespSpanish = await watson.transcribe(
+        _.get(req, "body.payload.event.url"),
+        "es"
+      );
+
+      let transcribeResp;
+
+      if (
+        transcribeRespEnglish.results[transcribeRespEnglish.result_index]
+          .alternatives[0].confidence >=
+        transcribeRespSpanish.results[transcribeRespSpanish.result_index]
+          .alternatives[0].confidence
+      ) {
+        transcribeResp = transcribeRespEnglish;
+      } else {
+        transcribeResp = transcribeRespSpanish;
+      }
 
       if (transcribeResp && transcribeResp.results.length > 0) {
         console.log(transcribeResp.results[transcribeResp.result_index]);
@@ -182,7 +201,9 @@ async function watsonTest(req, res) {
     // const resp = await watson.translate(req.body.text, req.body.fromLand, req.body.toLang);
     const resp = await watson.transcribe(req.body.audioLink);
     // translate the transcribed text
-    console.log(await watson.translate(resp.results[0].alternatives[0].transcript, 'es'));
+    console.log(
+      await watson.translate(resp.results[0].alternatives[0].transcript, "es")
+    );
     // const resp = await watson.analyzeTone(req.body.text);
     return res.status(200).json(resp);
   } catch (err) {

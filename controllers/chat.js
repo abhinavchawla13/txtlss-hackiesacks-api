@@ -107,8 +107,11 @@ async function webhook(req, res) {
         console.log("in start game state");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
+        console.log("imageUrl set - start game ");
       }
+      console.log("sendEvent - start", chatId, imageURL);
       const resp = await livechat.sendEvent(chatId, imageURL);
+      console.log("sendEvent - end");
       return res.status(200).send(`Game started: chatId`);
     } else {
       // * Watson calls *

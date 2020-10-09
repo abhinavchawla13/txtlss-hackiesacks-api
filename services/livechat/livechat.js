@@ -3,6 +3,7 @@ const config = require("../../config/config");
 
 exports.sendEvent = async (chatId, image_url, rich_message = true) => {
   try {
+    console.log("starting send event livechat.js");
     const resp = await axios({
       method: "post",
       auth: {
@@ -21,6 +22,7 @@ exports.sendEvent = async (chatId, image_url, rich_message = true) => {
         },
       },
     });
+    console.log("finishing send event livechat.js");
     return resp.data;
   } catch (err) {
     console.log("Send event failed", err);

@@ -25,7 +25,7 @@ module.exports = {
   sadness_start:
     "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/c9964cefb756bbef3448bec2dfc3d8ae/sad_start.png",
   game_start:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/7bf5f462d5a9ec8bd53c0bf6ae3be657/game_start.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/e9e500e2f2fecf65a4e1de813d39ae45/game_start.png",
   zero:
     "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/36d113076b2cd8aaa8479bc89e2d74b4/zerostar.png",
   one:

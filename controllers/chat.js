@@ -35,15 +35,26 @@ async function webhook(req, res) {
       _.get(req, "body.payload.event.content_type") === "video/mp4"
     ) {
       // * Use Watson to transcribe *
-      const transcribeRespEnglish = await watson.transcribe(
-        _.get(req, "body.payload.event.url"),
-        "en"
-      );
-
-      const transcribeRespSpanish = await watson.transcribe(
-        _.get(req, "body.payload.event.url"),
-        "es"
-      );
+      const PromiseArray = [];
+      let transcribeRespSpanish;
+      let transcribeRespEnglish;
+      PromiseArray.push(new Promise(async (resolve, reject) => {
+        const resp = await watson.transcribe(
+          _.get(req, "body.payload.event.url"),
+          "en"
+        );
+        transcribeRespEnglish = resp;
+        resolve(resp);
+      }));
+      PromiseArray.push(new Promise(async (resolve, reject) => {
+        const resp = await watson.transcribe(
+          _.get(req, "body.payload.event.url"),
+          "es"
+        );
+        transcribeRespSpanish = resp;
+        resolve(resp);
+      }));
+      await Promise.all(PromiseArray);
 
       let transcribeResp;
 

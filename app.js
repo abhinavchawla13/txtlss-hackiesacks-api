@@ -6,6 +6,8 @@ let Logger = require("./loaders/logger")("app");
 
 let loaders = require("./loaders");
 
+const cronService = require("./services/cron/index");
+
 async function startServer() {
   const app = express();
 
@@ -28,7 +30,10 @@ async function startServer() {
       🛡️  Server listening on port: ${config.port} 🛡️ 
       ################################################
     `);
+    
+    cronService.init();
   });
+
 }
 
 startServer();

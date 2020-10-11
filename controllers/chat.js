@@ -43,6 +43,9 @@ async function webhook(req, res) {
 
     // * check if audio already used
     // to prevent double sending
+    if (!_.get(req, "body.payload.event.name")) {
+      return res.send("---------- no payload event name ----------");
+    }
     console.log("allVoiceNames", _.get(req, "body.payload.event.name"));
     if (_.indexOf(allVoiceNames, _.get(req, "body.payload.event.name")) > -1) {
       throw new Error("Already taken care of - voice note");
@@ -131,8 +134,8 @@ async function webhook(req, res) {
 
       const randomOrder = shuffle(constants.emotions);
       const game = {
-        // order: randomOrder.slice(0, 3),
-        order: ["tentative", "joy", "anger"],
+        order: randomOrder.slice(0, 3),
+        // order: ["tentative", "joy", "anger"],
         score: 0,
         index: 0,
       };

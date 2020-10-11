@@ -46,7 +46,11 @@ async function webhook(req, res) {
     if (!_.get(req, "body.payload.event.name")) {
       return res.send("---------- no payload event name ----------");
     }
-    console.log("allVoiceNames", _.get(req, "body.payload.event.name"));
+    console.log(
+      "allVoiceNames",
+      allVoiceNames,
+      _.get(req, "body.payload.event.name")
+    );
     if (_.indexOf(allVoiceNames, _.get(req, "body.payload.event.name")) > -1) {
       throw new Error("Already taken care of - voice note");
     } else {

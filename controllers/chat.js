@@ -7,6 +7,7 @@ const constants = require("../constants");
 
 // * store user information
 const currentGames = {};
+const allVoiceNames = [];
 
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
@@ -38,6 +39,15 @@ async function webhook(req, res) {
       imageURL = constants.livechatCDNLinks["game_start"];
       await livechat.sendEvent(_.get(req, "body.payload.chat.id"), imageURL);
       return res.send("New incoming chat thread started!");
+    }
+
+    // * check if audio already used
+    // to prevent double sending
+    console.log("allVoiceNames", _.get(req, "body.payload.event.name"));
+    if (_.indexOf(allVoiceNames, _.get(req, "body.payload.event.name")) > -1) {
+      throw new Error("Already taken care of - voice note");
+    } else {
+      allVoiceNames.push(_.get(req, "body.payload.event.name"));
     }
 
     if (!req.body.payload.chat_id) {
@@ -80,9 +90,17 @@ async function webhook(req, res) {
 
       if (
         transcribeRespEnglish.results[transcribeRespEnglish.result_index]
-          .alternatives[0].confidence >=
+          .alternatives &&
+        transcribeRespEnglish.results[transcribeRespEnglish.result_index]
+          .alternatives.length > 0 &&
         transcribeRespSpanish.results[transcribeRespSpanish.result_index]
-          .alternatives[0].confidence
+          .alternatives &&
+        transcribeRespSpanish.results[transcribeRespSpanish.result_index]
+          .alternatives.length > 0 &&
+        transcribeRespEnglish.results[transcribeRespEnglish.result_index]
+          .alternatives[0].confidence >=
+          transcribeRespSpanish.results[transcribeRespSpanish.result_index]
+            .alternatives[0].confidence
       ) {
         transcribeResp = transcribeRespEnglish;
         console.log("English languaged used!");
@@ -113,7 +131,8 @@ async function webhook(req, res) {
 
       const randomOrder = shuffle(constants.emotions);
       const game = {
-        order: randomOrder.slice(0, 3),
+        // order: randomOrder.slice(0, 3),
+        order: ["tentative", "joy", "anger"],
         score: 0,
         index: 0,
       };

@@ -51,14 +51,14 @@ exports.init = async () => {
     );
     job.start();
 
-    const job2 = new Cron.CronJob(
-      "*/360 * * * *",
-      () => executeCronUpdateLinks(),
-      undefined,
-      true,
-      "America/New_York"
-    );
-    job2.start();
+    // const job2 = new Cron.CronJob(
+    //   "*/360 * * * *",
+    //   () => executeCronUpdateLinks(),
+    //   undefined,
+    //   true,
+    //   "America/New_York"
+    // );
+    // job2.start();
     return true;
   } catch (err) {
     console.log("Cron init failed", err);

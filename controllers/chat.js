@@ -24,9 +24,25 @@ async function webhook(req, res) {
     console.log("req.body.payload", req.body.payload);
     console.log("---------------------------------");
 
-    let imageURL = "";
+    if (req.body.secret_key != config.livechat_webhook_key) {
+      throw new Error("Secret key not matching");
+    }
 
+    console.log("secret key passed");
+
+    let imageURL = "";
     let kidMessage = "";
+
+    // * incoming chat (new thread)
+    if (req.body.action === "incoming_chat_thread") {
+      imageURL = constants.livechatCDNLinks["game_start"];
+      await livechat.sendEvent(_.get(req, "body.payload.chat.id"), imageURL);
+      return res.send("New incoming chat thread started!");
+    }
+
+    if (!req.body.payload.chat_id) {
+      throw new Error("No Chat Id");
+    }
 
     if (_.get(req, "body.payload.event.type") === "message") {
       kidMessage = _.get(req, "body.payload.event.text");
@@ -35,15 +51,30 @@ async function webhook(req, res) {
       _.get(req, "body.payload.event.content_type") === "video/mp4"
     ) {
       // * Use Watson to transcribe *
-      const transcribeRespEnglish = await watson.transcribe(
-        _.get(req, "body.payload.event.url"),
-        "en"
+      const PromiseArray = [];
+      let transcribeRespSpanish;
+      let transcribeRespEnglish;
+      PromiseArray.push(
+        new Promise(async (resolve, reject) => {
+          const resp = await watson.transcribe(
+            _.get(req, "body.payload.event.url"),
+            "en"
+          );
+          transcribeRespEnglish = resp;
+          resolve(resp);
+        })
       );
-
-      const transcribeRespSpanish = await watson.transcribe(
-        _.get(req, "body.payload.event.url"),
-        "es"
+      PromiseArray.push(
+        new Promise(async (resolve, reject) => {
+          const resp = await watson.transcribe(
+            _.get(req, "body.payload.event.url"),
+            "es"
+          );
+          transcribeRespSpanish = resp;
+          resolve(resp);
+        })
       );
+      await Promise.all(PromiseArray);
 
       let transcribeResp;
 
@@ -74,114 +105,106 @@ async function webhook(req, res) {
 
     console.log("kidMessage transcribed: ", kidMessage);
 
-    if (req.body.secret_key != config.livechat_webhook_key) {
-      throw new Error("Secret key not matching");
-    }
-
-    console.log("secret key passed");
-
-    if (!req.body.payload.chat_id) {
-      throw new Error("No Chat Id");
-    }
-
     let deactivateChatCheck = false;
     const chatId = _.get(req, "body.payload.chat_id");
 
-    if (!(chatId in currentGames)) {
-      console.log("chatId not in currentGames");
+    if (kidMessage.toLowerCase().includes("ready")) {
+      console.log("in ready state");
 
-      if (kidMessage.toLowerCase().includes("ready")) {
-        console.log("in ready state");
+      const randomOrder = shuffle(constants.emotions);
+      const game = {
+        order: randomOrder.slice(0, 3),
+        score: 0,
+        index: 0,
+      };
 
-        const randomOrder = shuffle(constants.emotions);
-        const game = {
-          order: randomOrder.slice(0, 3),
-          score: 0,
-          index: 0,
-        };
+      currentGames[chatId] = game;
+      // send first photo
+      imageURL = constants.livechatCDNLinks[randomOrder[0] + "_start"];
+      await livechat.sendEvent(chatId, imageURL);
+      return res.send("ready system - first image send");
+    } else {
+      if (!(chatId in currentGames)) {
+        console.log("chatId not in currentGames");
 
-        currentGames[chatId] = game;
-        // send first photo
-        imageURL = constants.livechatCDNLinks[randomOrder[0] + "_start"];
-      } else {
         console.log("in start game state");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
-        console.log("imageUrl set - start game ");
-      }
-      console.log("sendEvent - start", chatId, imageURL);
-      const resp = await livechat.sendEvent(chatId, imageURL);
-      console.log("sendEvent - end");
-      return res.status(200).send(`Game started: chatId`);
-    } else {
-      // * Watson calls *
-
-      //* translate if needed
-      console.log("translate language", kidMessage);
-      const currentLang = await watson.identifyLanguage(kidMessage);
-      console.log("currentLang", currentLang);
-      if (currentLang.language !== "en") {
-        const translatedKidMessage = await watson.translate(
-          kidMessage,
-          currentLang.language
-        );
-
-        console.log("translatedKidMessage", translatedKidMessage);
-        kidMessage = translatedKidMessage.translations[0].translation;
-      }
-
-      console.log("kidMessage language: ", currentLang.language);
-
-      const tone = await watson.analyzeTone(kidMessage);
-
-      // * Pick out of 4 emotions: tentative, Joy, Anger, Sadness
-      // * id: tentative, joy, anger, sadness
-      const emotionFromKidMessage = tone.tone_id;
-      console.log("emotionFromKidMessage", emotionFromKidMessage);
-
-      // * check if it matches, if so update score
-      const currentIndex = currentGames[chatId]["index"];
-      console.log("currentGames[chatId]", currentGames[chatId]);
-      let currentGameWin = false;
-      if (
-        currentGames[chatId]["order"][currentIndex] === emotionFromKidMessage
-      ) {
-        currentGames[chatId]["score"] += 1;
-        currentGameWin = true;
-        console.log("current game won");
-      }
-      console.log("kid score: ", currentGames[chatId]["score"]);
-
-      // * update index
-      currentGames[chatId]["index"] += 1;
-      console.log("game round: ", currentGames[chatId]["index"]);
-
-      // * if index reaches 3, game over
-      if (currentGames[chatId]["index"] >= 3) {
-        // select image related to the score
-        // deactivate the chat
-        // remove the game from currentGames
-
-        const finalScore = currentGames[chatId]["score"];
-        console.log("finalScore", finalScore);
-        if (finalScore === 0) {
-          imageURL = constants.livechatCDNLinks["zero"];
-        } else if (finalScore === 1) {
-          imageURL = constants.livechatCDNLinks["one"];
-        } else if (finalScore === 2) {
-          imageURL = constants.livechatCDNLinks["two"];
-        } else {
-          imageURL = constants.livechatCDNLinks["three"];
-        }
-        delete currentGames[chatId];
-        deactivateChatCheck = true;
+        console.log("imageUrl set - start game");
+        console.log("sendEvent - start", chatId, imageURL);
+        const resp = await livechat.sendEvent(chatId, imageURL);
+        console.log("sendEvent - end");
+        return res.status(200).send(`Game started: chatId`);
       } else {
-        const nextEmotion =
-          currentGames[chatId]["order"][currentGames[chatId]["index"]];
-        if (currentGameWin) {
-          imageURL = constants.livechatCDNLinks[nextEmotion + "_correct"];
+        // * Watson calls *
+
+        //* translate if needed
+        console.log("translate language", kidMessage);
+        const currentLang = await watson.identifyLanguage(kidMessage);
+        console.log("currentLang", currentLang);
+        if (currentLang.language !== "en") {
+          const translatedKidMessage = await watson.translate(
+            kidMessage,
+            currentLang.language
+          );
+
+          console.log("translatedKidMessage", translatedKidMessage);
+          kidMessage = translatedKidMessage.translations[0].translation;
+        }
+
+        console.log("kidMessage language: ", currentLang.language);
+
+        const tone = await watson.analyzeTone(kidMessage);
+
+        // * Pick out of 4 emotions: tentative, Joy, Anger, Sadness
+        // * id: tentative, joy, anger, sadness
+        const emotionFromKidMessage = tone.tone_id;
+        console.log("emotionFromKidMessage", emotionFromKidMessage);
+
+        // * check if it matches, if so update score
+        const currentIndex = currentGames[chatId]["index"];
+        console.log("currentGames[chatId]", currentGames[chatId]);
+        let currentGameWin = false;
+        if (
+          currentGames[chatId]["order"][currentIndex] === emotionFromKidMessage
+        ) {
+          currentGames[chatId]["score"] += 1;
+          currentGameWin = true;
+          console.log("current game won");
+        }
+        console.log("kid score: ", currentGames[chatId]["score"]);
+
+        // * update index
+        currentGames[chatId]["index"] += 1;
+        console.log("game round: ", currentGames[chatId]["index"]);
+
+        // * if index reaches 3, game over
+        if (currentGames[chatId]["index"] >= 3) {
+          // select image related to the score
+          // deactivate the chat
+          // remove the game from currentGames
+
+          const finalScore = currentGames[chatId]["score"];
+          console.log("finalScore", finalScore);
+          if (finalScore === 0) {
+            imageURL = constants.livechatCDNLinks["zero"];
+          } else if (finalScore === 1) {
+            imageURL = constants.livechatCDNLinks["one"];
+          } else if (finalScore === 2) {
+            imageURL = constants.livechatCDNLinks["two"];
+          } else {
+            imageURL = constants.livechatCDNLinks["three"];
+          }
+          delete currentGames[chatId];
+          deactivateChatCheck = true;
         } else {
-          imageURL = constants.livechatCDNLinks[nextEmotion + "_wrong"];
+          const nextEmotion =
+            currentGames[chatId]["order"][currentGames[chatId]["index"]];
+          if (currentGameWin) {
+            imageURL = constants.livechatCDNLinks[nextEmotion + "_correct"];
+          } else {
+            imageURL = constants.livechatCDNLinks[nextEmotion + "_wrong"];
+          }
         }
       }
 

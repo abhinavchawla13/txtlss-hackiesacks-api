@@ -41,22 +41,6 @@ async function webhook(req, res) {
       return res.send("New incoming chat thread started!");
     }
 
-    // * check if audio already used
-    // to prevent double sending
-    if (!_.get(req, "body.payload.event.name")) {
-      return res.send("---------- no payload event name ----------");
-    }
-    console.log(
-      "allVoiceNames",
-      allVoiceNames,
-      _.get(req, "body.payload.event.name")
-    );
-    if (_.indexOf(allVoiceNames, _.get(req, "body.payload.event.name")) > -1) {
-      throw new Error("Already taken care of - voice note");
-    } else {
-      allVoiceNames.push(_.get(req, "body.payload.event.name"));
-    }
-
     if (!req.body.payload.chat_id) {
       throw new Error("No Chat Id");
     }
@@ -67,6 +51,21 @@ async function webhook(req, res) {
       _.get(req, "body.payload.event.type") === "file" &&
       _.get(req, "body.payload.event.content_type") === "video/mp4"
     ) {
+      // * check if audio already used
+      // to prevent double sending
+      if (!_.get(req, "body.payload.event.name")) {
+        console.log("---------- no payload event name ----------");
+        return res.send("---------- no payload event name ----------");
+      }
+
+      if (
+        _.indexOf(allVoiceNames, _.get(req, "body.payload.event.name")) > -1
+      ) {
+        throw new Error("Already taken care of - voice note");
+      } else {
+        allVoiceNames.push(_.get(req, "body.payload.event.name"));
+      }
+
       // * Use Watson to transcribe *
       const PromiseArray = [];
       let transcribeRespSpanish;

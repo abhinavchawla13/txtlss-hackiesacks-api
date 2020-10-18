@@ -4,10 +4,16 @@ const config = require("../config/config");
 const _ = require("lodash");
 const e = require("express");
 const constants = require("../constants");
+const Stats = require("../models/stats");
 
 // * store user information
 const currentGames = {};
 const allVoiceNames = [];
+const dateOptions = {
+  month: "2-digit",
+  day: "2-digit",
+  year: "numeric",
+};
 
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
@@ -28,8 +34,6 @@ async function webhook(req, res) {
     if (req.body.secret_key != config.livechat_webhook_key) {
       throw new Error("Secret key not matching");
     }
-
-    console.log("secret key passed");
 
     let imageURL = "";
     let kidMessage = "";
@@ -132,6 +136,47 @@ async function webhook(req, res) {
     let deactivateChatCheck = false;
     const chatId = _.get(req, "body.payload.chat_id");
 
+    let stats = await Stats.find({
+      customerId: _.get(req, "body.payload.event.author_id"),
+    });
+
+    console.log("OG stats type", typeof stats, stats.constructor.name);
+
+    if (!stats || stats.length < 1) {
+      console.log("hola stats in here");
+      stats = new Stats({
+        customerId: _.get(req, "body.payload.event.author_id"),
+        totalGames: 0,
+        gamesByDate: {},
+        averageScore: 0,
+        emotionCorrectness: {
+          anger: {
+            correct: 0,
+            total: 0,
+          },
+          tentative: {
+            correct: 0,
+            total: 0,
+          },
+          joy: {
+            correct: 0,
+            total: 0,
+          },
+          sadness: {
+            correct: 0,
+            total: 0,
+          },
+        },
+        finalScores: [],
+      });
+      const today = new Date().toLocaleDateString("en-US", dateOptions);
+
+      stats.gamesByDate[today] = 0;
+      await stats.save();
+    } else {
+      stats = stats[0];
+    }
+
     if (kidMessage.toLowerCase().includes("ready")) {
       console.log("in ready state");
 
@@ -147,6 +192,22 @@ async function webhook(req, res) {
       // send first photo
       imageURL = constants.livechatCDNLinks[randomOrder[0] + "_start"];
       await livechat.sendEvent(chatId, imageURL);
+
+      // update stats
+      const today = new Date().toLocaleDateString("en-US", dateOptions);
+      console.log("Stats type", typeof stats);
+      stats.totalGames += 1;
+      if (today in stats.gamesByDate) {
+        stats.gamesByDate[today] += 1;
+        console.log(" -------------- update  YES", stats.gamesByDate[today]);
+      } else {
+        stats.gamesByDate[today] = 1;
+        console.log(" -------------- update  no", stats.gamesByDate[today]);
+      }
+      console.log("stats after update...", stats);
+      stats.markModified("gamesByDate");
+      await stats.save();
+
       return res.send("ready system - first image send");
     } else {
       if (!(chatId in currentGames)) {
@@ -155,9 +216,11 @@ async function webhook(req, res) {
         console.log("in start game state");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
-        console.log("imageUrl set - start game");
-        console.log("sendEvent - start", chatId, imageURL);
+
+        console.log(" -------------- update  gamesByDate");
+
         const resp = await livechat.sendEvent(chatId, imageURL);
+
         console.log("sendEvent - end");
         return res.status(200).send(`Game started: chatId`);
       } else {
@@ -190,13 +253,21 @@ async function webhook(req, res) {
         const currentIndex = currentGames[chatId]["index"];
         console.log("currentGames[chatId]", currentGames[chatId]);
         let currentGameWin = false;
+
+        console.log("stats", stats);
+
         if (
           currentGames[chatId]["order"][currentIndex] === emotionFromKidMessage
         ) {
           currentGames[chatId]["score"] += 1;
           currentGameWin = true;
+          const currentEmotion = currentGames[chatId]["order"][currentIndex];
+          stats.emotionCorrectness[currentEmotion].correct += 1;
           console.log("current game won");
         }
+        stats.emotionCorrectness[
+          currentGames[chatId]["order"][currentIndex]
+        ].total += 1;
         console.log("kid score: ", currentGames[chatId]["score"]);
 
         // * update index
@@ -211,6 +282,11 @@ async function webhook(req, res) {
 
           const finalScore = currentGames[chatId]["score"];
           console.log("finalScore", finalScore);
+
+          stats.finalScores.push(finalScore);
+          stats.averageScore =
+            _.sum(stats.finalScores) / stats.finalScores.length;
+
           if (finalScore === 0) {
             imageURL = constants.livechatCDNLinks["zero"];
           } else if (finalScore === 1) {
@@ -235,6 +311,7 @@ async function webhook(req, res) {
 
       console.log("send event to LC - start");
       const resp = await livechat.sendEvent(chatId, imageURL);
+      await stats.save();
       console.log("send event to LC - done");
       if (deactivateChatCheck) {
         await livechat.deactivateChat(chatId);
@@ -272,6 +349,10 @@ async function watsonTest(req, res) {
     // const resp = await watson.analyzeTone(req.body.text);
     return res.status(200).json(resp);
   } catch (err) {
+    if (err.response.data) {
+      console.log(err.response.data.error);
+      return res.status(400).json(err.response.data.error);
+    }
     console.log(err);
     return res.status(400).json(err);
   }

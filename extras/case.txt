@@ -1,0 +1,30 @@
+case 1: delete from fb, not from LC -> incoming event
+case 2: delete from LC, not from fb -> incoming chat thread
+case 3: delete from LC, delete from fb
+
+
+req.body.webhook_id a41e51266a6171ff93cbe525d48758fb
+req.body.action incoming_chat_thread
+req.body.payload {
+  chat: {
+    id: 'QHEWIBPNDM',
+    users: [ [Object], [Object] ],
+    thread: {
+      id: 'QI617PFLYI',
+      timestamp: 1602433494,
+      active: true,
+      order: 17,
+      properties: [Object],
+      user_ids: [Array],
+      events: [Array],
+      access: [Object]
+    },
+    properties: {
+      '0e655920289dbafb0376a0f4491372d9': [Object],
+      routing: [Object],
+      source: [Object],
+      supervising: [Object]
+    },
+    access: { group_ids: [Array] }
+  }
+}

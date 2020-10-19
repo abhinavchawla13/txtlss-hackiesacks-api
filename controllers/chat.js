@@ -298,10 +298,10 @@ async function webhook(req, res) {
 
       const resp = await livechat.sendEvent(chatId, imageURL);
       await stats.save();
-      if (deactivateChatCheck) {
-        await livechat.deactivateChat(chatId);
-        deactivateChatCheck = false;
-      }
+      // if (deactivateChatCheck) {
+      //   await livechat.deactivateChat(chatId);
+      //   deactivateChatCheck = false;
+      // }
       return res.send("Sent!");
     }
   } catch (error) {

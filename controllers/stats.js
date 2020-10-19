@@ -263,7 +263,6 @@ async function notify(req, res) {
       message += `Your performance was brilliant. Here is a resource you might find interesting: https://blog.stageslearning.com/blog/teaching-children-with-autism-about-emotions`;
     }
 
-    await livechat.activateChat(req.query.chat_id);
     await livechat.sendEvent(
       req.query.chat_id,
       message,

@@ -1,6 +1,5 @@
 # txtlss hackiesacks API
-![Heroku](https://heroku-badge.herokuapp.com/?app=heroku-badge)
-
+<img src="https://img.shields.io/badge/node.js%20-%2343853D.svg?&style=for-the-badge&logo=node.js&logoColor=white"/> <img src ="https://img.shields.io/badge/MongoDB-%234ea94b.svg?&style=for-the-badge&logo=mongodb&logoColor=white"/> <a href="https://txtlss-hackiesacks.herokuapp.com/" target="_blank"><img src="https://img.shields.io/badge/heroku%20-%23430098.svg?&style=for-the-badge&logo=heroku&logoColor=white"/></a>
 ## Running Locally
 
 Make sure you have [Node.js](http://nodejs.org/) (atleast v12.13.0, npm v6.12.0) installed.

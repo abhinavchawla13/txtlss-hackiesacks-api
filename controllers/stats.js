@@ -183,7 +183,16 @@ async function getOne(req, res) {
   }
 }
 
+async function notify(req, res) {
+  try {
+    res.send("User notified");
+  } catch (error) {
+    console.log("notify error", error);
+  }
+}
+
 module.exports = {
   getAll,
   getOne,
+  notify,
 };

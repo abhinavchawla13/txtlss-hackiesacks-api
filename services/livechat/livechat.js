@@ -1,5 +1,6 @@
 const axios = require("axios");
 const config = require("../../config/config");
+const _ = require("lodash");
 
 exports.sendEvent = async (chatId, image_url, rich_message = true) => {
   try {
@@ -25,7 +26,14 @@ exports.sendEvent = async (chatId, image_url, rich_message = true) => {
     console.log("finishing send event livechat.js");
     return resp.data;
   } catch (err) {
-    console.log("!!! Send event failed !!!");
+    if (_.get(error, "response.data.error.message")) {
+      console.log(
+        "!!! Send event failed !!!",
+        _.get(error, "response.data.error.message")
+      );
+    } else {
+      console.log("!!! Send event failed !!!");
+    }
   }
 };
 
@@ -44,8 +52,25 @@ exports.deactivateChat = async (chatId) => {
     });
     return resp.data;
   } catch (error) {
-    console.log("Deactivate chat failed", err);
+    console.log("Deactivate chat failed", error);
   }
+};
+
+exports.activateChat = async (chatId) => {
+  return axios({
+    method: "post",
+    auth: {
+      username: config.livechat_username,
+      password: config.livechat_password,
+    },
+    url: "https://api.livechatinc.com/v3.2/agent/action/activate_chat",
+    data: {
+      chat: {
+        id: chatId,
+        continuous: true,
+      },
+    },
+  });
 };
 
 // exports.uploadFile = async (fileName) => {

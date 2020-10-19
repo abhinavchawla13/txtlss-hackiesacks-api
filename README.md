@@ -1,4 +1,5 @@
 # txtlss hackiesacks API
+![Heroku](https://heroku-badge.herokuapp.com/?app=heroku-badge)
 
 ## Running Locally
 
@@ -16,12 +17,22 @@ npm run start
 Add a `.env` file in the root folder (you should setup your LiveChat, IBM Watson Credentials):
 
 ```
+PORT=8081
 NODE_ENV=development
-PORT=8000
 LIVECHAT_USERNAME=
 LIVECHAT_PASSWORD=
 LIVECHAT_WEBHOOK_KEY=
-WATSON_APIKEY=
+LIVECHAT_WEBHOOK_KEY_START=
+LANGUAGE_TRANSLATOR_URL=
+SPEECH_TO_TEXT_URL=
+TEXT_TO_SPEECH_URL=
+TONE_ANALYZER_URL=
+LANGUAGE_TRANSLATOR_API=
+SPEECH_TO_TEXT_API=
+TEXT_TO_SPEECH_API=
+TONE_ANALYZER_API=
+MONGODB_URI=
+
 ```
 
 Add a `ibm-credentials.env` file in the root folder for automatic watson authentication.
@@ -29,3 +40,11 @@ Add a `ibm-credentials.env` file in the root folder for automatic watson authent
 ## Deployment
 
 Heroku pipeline is set to auto deploy `master` branch currently.
+
+
+## Some screenshots
+
+<p float="left">
+  <img src="https://i.imgur.com/gYYcA3R.png" width="300" />
+  <img src="https://i.imgur.com/ADh62gh.png" width="300" /> 
+</p>

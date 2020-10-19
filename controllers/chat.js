@@ -25,11 +25,11 @@ async function webhook(req, res) {
       throw new Error("Webhook not received");
     }
 
-    console.log("---------------------------------");
-    console.log("req.body.webhook_id", req.body.webhook_id);
-    console.log("req.body.action", req.body.action);
-    console.log("req.body.payload", req.body.payload);
-    console.log("---------------------------------");
+    // console.log("---------------------------------");
+    // console.log("req.body.webhook_id", req.body.webhook_id);
+    // console.log("req.body.action", req.body.action);
+    // console.log("req.body.payload", req.body.payload);
+    // console.log("---------------------------------");
 
     if (req.body.secret_key != config.livechat_webhook_key) {
       throw new Error("Secret key not matching");
@@ -195,16 +195,12 @@ async function webhook(req, res) {
 
       // update stats
       const today = new Date().toLocaleDateString("en-US", dateOptions);
-      console.log("Stats type", typeof stats);
       stats.totalGames += 1;
       if (today in stats.gamesByDate) {
         stats.gamesByDate[today] += 1;
-        console.log(" -------------- update  YES", stats.gamesByDate[today]);
       } else {
         stats.gamesByDate[today] = 1;
-        console.log(" -------------- update  no", stats.gamesByDate[today]);
       }
-      console.log("stats after update...", stats);
       stats.markModified("gamesByDate");
       await stats.save();
 
@@ -212,16 +208,9 @@ async function webhook(req, res) {
     } else {
       if (!(chatId in currentGames)) {
         console.log("chatId not in currentGames");
-
-        console.log("in start game state");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
-
-        console.log(" -------------- update  gamesByDate");
-
         const resp = await livechat.sendEvent(chatId, imageURL);
-
-        console.log("sendEvent - end");
         return res.status(200).send(`Game started: chatId`);
       } else {
         // * Watson calls *
@@ -253,8 +242,6 @@ async function webhook(req, res) {
         const currentIndex = currentGames[chatId]["index"];
         console.log("currentGames[chatId]", currentGames[chatId]);
         let currentGameWin = false;
-
-        console.log("stats", stats);
 
         if (
           currentGames[chatId]["order"][currentIndex] === emotionFromKidMessage
@@ -309,10 +296,8 @@ async function webhook(req, res) {
         }
       }
 
-      console.log("send event to LC - start");
       const resp = await livechat.sendEvent(chatId, imageURL);
       await stats.save();
-      console.log("send event to LC - done");
       if (deactivateChatCheck) {
         await livechat.deactivateChat(chatId);
         deactivateChatCheck = false;

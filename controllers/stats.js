@@ -1,6 +1,7 @@
 const { round, sum } = require("lodash");
 const constants = require("../constants");
 const Stats = require("../models/stats");
+const livechat = require("../services/livechat");
 
 async function getAll(req, res) {
   const stats = await Stats.find({});
@@ -146,32 +147,36 @@ async function getOne(req, res) {
       averageScore: parseFloat(stats.averageScore.toFixed(2)),
       emotionCorrectness: {
         anger: {
-          percentage: round(
-            (stats.emotionCorrectness.anger.correct /
-              stats.emotionCorrectness.anger.total) *
-              100
-          ),
+          percentage:
+            round(
+              (stats.emotionCorrectness.anger.correct /
+                stats.emotionCorrectness.anger.total) *
+                100
+            ) || 0,
         },
         tentative: {
-          percentage: round(
-            (stats.emotionCorrectness.tentative.correct /
-              stats.emotionCorrectness.tentative.total) *
-              100
-          ),
+          percentage:
+            round(
+              (stats.emotionCorrectness.tentative.correct /
+                stats.emotionCorrectness.tentative.total) *
+                100
+            ) || 0,
         },
         joy: {
-          percentage: round(
-            (stats.emotionCorrectness.joy.correct /
-              stats.emotionCorrectness.joy.total) *
-              100
-          ),
+          percentage:
+            round(
+              (stats.emotionCorrectness.joy.correct /
+                stats.emotionCorrectness.joy.total) *
+                100
+            ) || 0,
         },
         sadness: {
-          percentage: round(
-            (stats.emotionCorrectness.sadness.correct /
-              stats.emotionCorrectness.sadness.total) *
-              100
-          ),
+          percentage:
+            round(
+              (stats.emotionCorrectness.sadness.correct /
+                stats.emotionCorrectness.sadness.total) *
+                100
+            ) || 0,
         },
       },
       finalScores: stats.finalScores,
@@ -185,7 +190,86 @@ async function getOne(req, res) {
 
 async function notify(req, res) {
   try {
-    res.send("User notified");
+    if (!req.query.customer_id) {
+      throw new Error("customerId not provided");
+    }
+
+    const stats = await Stats.findOne({ customerId: req.query.customer_id });
+
+    if (!stats) {
+      console.log("No stats found");
+    }
+
+    const userStats = {
+      customerId: stats.customerId,
+      totalGames: stats.totalGames,
+      averageScore: parseFloat(stats.averageScore.toFixed(2)),
+      emotionCorrectness: {
+        anger:
+          {
+            percentage: round(
+              (stats.emotionCorrectness.anger.correct /
+                stats.emotionCorrectness.anger.total) *
+                100
+            ),
+          } || -1,
+        tentative: {
+          percentage: round(
+            (stats.emotionCorrectness.tentative.correct /
+              stats.emotionCorrectness.tentative.total) *
+              100
+          ),
+        },
+        joy: {
+          percentage:
+            round(
+              (stats.emotionCorrectness.joy.correct /
+                stats.emotionCorrectness.joy.total) *
+                100
+            ) || -1,
+        },
+        sadness: {
+          percentage:
+            round(
+              (stats.emotionCorrectness.sadness.correct /
+                stats.emotionCorrectness.sadness.total) *
+                100
+            ) || -1,
+        },
+      },
+    };
+
+    const lowest = Object.keys(userStats.emotionCorrectness)
+      .filter((key) => userStats.emotionCorrectness[key].percentage != -1)
+      .reduce((a, b) =>
+        userStats.emotionCorrectness[a].percentage <
+        userStats.emotionCorrectness[b].percentage
+          ? a
+          : b
+      );
+
+    const highest = Object.keys(userStats.emotionCorrectness).reduce((a, b) =>
+      userStats.emotionCorrectness[a].percentage >
+      userStats.emotionCorrectness[b].percentage
+        ? a
+        : b
+    );
+
+    let message = `Thanks for playing The Emotican Game! \n\nYou played the game ${userStats.totalGames} number of times and your average score was ${userStats.averageScore} out of 3. \n\n`;
+
+    if (userStats.averageScore < 3) {
+      message += `Based on your performance, we found you had the most trouble guessing the "${lowest}" emotion, while performing best guessing "${highest}" emotion.\n\nWe recommend you the following resource to help you improve: https://blog.stageslearning.com/blog/teaching-children-with-autism-about-emotions`;
+    } else {
+      message += `Your performance was brilliant. Here is a resource you might find interesting: https://blog.stageslearning.com/blog/teaching-children-with-autism-about-emotions`;
+    }
+
+    await livechat.sendEvent(
+      req.query.chat_id,
+      message,
+      (rich_message = false)
+    );
+
+    res.status(200).send("User notified");
   } catch (error) {
     console.log("notify error", error);
   }

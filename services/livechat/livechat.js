@@ -2,34 +2,54 @@ const axios = require("axios");
 const config = require("../../config/config");
 const _ = require("lodash");
 
-exports.sendEvent = async (chatId, image_url, rich_message = true) => {
+exports.sendEvent = async (chatId, image_url_or_text, rich_message = true) => {
   try {
-    console.log("starting send event livechat.js");
-    const resp = await axios({
-      method: "post",
-      auth: {
-        username: config.livechat_username,
-        password: config.livechat_password,
-      },
-      url: "https://api.livechatinc.com/v3.2/agent/action/send_event",
-      data: {
-        chat_id: chatId,
-        event: {
-          type: "file",
-          recipients: "all",
-          template_id: "cards",
-          url: image_url,
-          content_type: "image/png",
+    console.log("starting send event livechat.js", rich_message);
+    if (rich_message) {
+      const resp = await axios({
+        method: "post",
+        auth: {
+          username: config.livechat_username,
+          password: config.livechat_password,
         },
-      },
-    });
+        url: "https://api.livechatinc.com/v3.2/agent/action/send_event",
+        data: {
+          chat_id: chatId,
+          event: {
+            type: "file",
+            recipients: "all",
+            template_id: "cards",
+            url: image_url_or_text,
+            content_type: "image/png",
+          },
+        },
+      });
+    } else {
+      const resp = await axios({
+        method: "post",
+        auth: {
+          username: config.livechat_username,
+          password: config.livechat_password,
+        },
+        url: "https://api.livechatinc.com/v3.2/agent/action/send_event",
+        data: {
+          chat_id: chatId,
+          event: {
+            type: "message",
+            recipients: "all",
+            text: image_url_or_text,
+          },
+        },
+      });
+    }
+
     console.log("finishing send event livechat.js");
     return resp.data;
   } catch (err) {
-    if (_.get(error, "response.data.error.message")) {
+    if (_.get(err, "response.data.error.message")) {
       console.log(
         "!!! Send event failed !!!",
-        _.get(error, "response.data.error.message")
+        _.get(err, "response.data.error.message")
       );
     } else {
       console.log("!!! Send event failed !!!");
@@ -89,7 +109,7 @@ exports.activateChat = async (chatId) => {
 //           type: "file",
 //           recipients: "all",
 //           template_id: "cards",
-//           url: image_url,
+//           url: image_url_or_text,
 //           content_type: "image/png",
 //         },
 //       },

@@ -1,37 +1,37 @@
 // TODO: Update URLs
 module.exports = {
   anger_correct:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/56e0e2a79bbe14834a8454994e55337c/angry_correct.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/2253ee12858cd49830fdd3f374084255/angry_correct.png",
   anger_wrong:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/5b5967d3adc59ad81244e440db4bfb43/angry_wrong.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/f731d205db5b31bed47d660402a11fec/angry_wrong.png",
   anger_start:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/b1e1ce22aa44a81c51736915e5dcefba/angry_start.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/6437ac1b9150c4f61d23cb480597392d/angry_start.png",
   tentative_correct:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/e342dcb5db2cf938dbc8cf69ba723bbb/confused_correct.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/d7b6c42b89ba519bf78a01e5bc759b42/confused_correct.png",
   tentative_wrong:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/61bfb5c23867e1ded1f150737f734e29/confused_wrong.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/fefd1f822f8f2418a9b8f74e33843341/confused_wrong.png",
   tentative_start:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/b07c59f5bbfaa50402d6d3727dfc989b/confused_start.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/accb8e1b604cd5554293d89c9d9959bc/confused_start.png",
   joy_correct:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/e142417208951d6bfc437b8b84c0a59d/happy_correct.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/4fb440ea02b769324cedd56d56a44c82/happy_correct.png",
   joy_wrong:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/6386589e0399dce7fcddd3a980340f0c/happy_wrong.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/8a5b58976af5d6f489420c8bf7a302f8/happy_wrong.png",
   joy_start:
     "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/aebcacc4b5468b626053c93dc782b953/happy_start.png",
   sadness_correct:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/bdf00055c34db28f920bd8851872d0fa/sad_correct.jpg",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/2677ddbac703680a8a077ddc20ea4924/sad_correct.jpg",
   sadness_wrong:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/16325f9712ab75fab543bac6c7c56e1a/sad_wrong.jpg",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/852d7291f84cb755ffabd8715fc7de53/sad_wrong.jpg",
   sadness_start:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/5bf4d413fb3c0bd82f360c6a0955ea83/sad_start.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/4fa7583126fb585b31a569e07649b1b8/sad_start.png",
   game_start:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/04dfe1d3073171fce831d14d5b2d3e0e/game_start.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/e3eb22097ccd8562d89a1667d91d00d1/game_start.png",
   zero:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/a4cb83e90c9e1214c9dd8059a24d002a/zerostar.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/21c855a83aff148740d12865f4cd932c/zerostar.png",
   one:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/7790ea0e99925bf24badfc7b5321173b/onestar.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/789541d6d8458c76242d64932c3802a0/onestar.png",
   two:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/49e484690d892526607ce2f370fbe13d/twostars.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/df07bdac1854266a4f29d2bdc40fea3d/twostars.png",
   three:
-    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/e3c9c032526e53d1ee6d13e0e851fb4b/threestars.png",
+    "https://cdn.livechat-files.com/api/file/lc/tmp/attachments/12262749/2e761a2a728ff64439de1414fe18a10b/threestars.png",
 };

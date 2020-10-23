@@ -19,6 +19,14 @@ function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
+async function webhook3(req, res) {
+  try {
+    console.log("helooa..");
+    await livechat.sendEvent("123", "angry", true, "correct");
+  } catch (error) {
+    console.log(error);
+  }
+}
 async function webhook(req, res) {
   try {
     if (!req.body.webhook_id) {
@@ -37,17 +45,26 @@ async function webhook(req, res) {
 
     let imageURL = "";
     let kidMessage = "";
+    let imageMain = "";
+    let imageType = "";
 
     // * incoming chat (new thread)
     if (req.body.action === "incoming_chat_thread") {
       imageURL = constants.livechatCDNLinks["game_start"];
-      await livechat.sendEvent(_.get(req, "body.payload.chat.id"), imageURL);
+      await livechat.sendEvent(
+        _.get(req, "body.payload.chat.id"),
+        "game",
+        true,
+        "start"
+      );
       return res.send("New incoming chat thread started!");
     }
 
     if (!req.body.payload.chat_id) {
       throw new Error("No Chat Id");
     }
+
+    console.log("chat_id", req.body.payload.chat_id);
 
     if (_.get(req, "body.payload.event.type") === "message") {
       kidMessage = _.get(req, "body.payload.event.text");
@@ -191,7 +208,7 @@ async function webhook(req, res) {
       currentGames[chatId] = game;
       // send first photo
       imageURL = constants.livechatCDNLinks[randomOrder[0] + "_start"];
-      await livechat.sendEvent(chatId, imageURL);
+      await livechat.sendEvent(chatId, randomOrder[0], true, "start");
 
       // update stats
       const today = new Date().toLocaleDateString("en-US", dateOptions);
@@ -210,7 +227,7 @@ async function webhook(req, res) {
         console.log("chatId not in currentGames");
         // set start game photo
         imageURL = constants.livechatCDNLinks["game_start"];
-        const resp = await livechat.sendEvent(chatId, imageURL);
+        const resp = await livechat.sendEvent(chatId, "game", true, "start");
         return res.status(200).send(`Game started: chatId`);
       } else {
         // * Watson calls *
@@ -276,12 +293,20 @@ async function webhook(req, res) {
 
           if (finalScore === 0) {
             imageURL = constants.livechatCDNLinks["zero"];
+            imageMain = "zero";
+            imageType = "";
           } else if (finalScore === 1) {
             imageURL = constants.livechatCDNLinks["one"];
+            imageMain = "one";
+            imageType = "";
           } else if (finalScore === 2) {
             imageURL = constants.livechatCDNLinks["two"];
+            imageMain = "two";
+            imageType = "";
           } else {
             imageURL = constants.livechatCDNLinks["three"];
+            imageMain = "three";
+            imageType = "";
           }
           delete currentGames[chatId];
           deactivateChatCheck = true;
@@ -290,13 +315,17 @@ async function webhook(req, res) {
             currentGames[chatId]["order"][currentGames[chatId]["index"]];
           if (currentGameWin) {
             imageURL = constants.livechatCDNLinks[nextEmotion + "_correct"];
+            imageMain = "nextEmotion";
+            imageType = "correct";
           } else {
             imageURL = constants.livechatCDNLinks[nextEmotion + "_wrong"];
+            imageMain = "nextEmotion";
+            imageType = "wrong";
           }
         }
       }
 
-      const resp = await livechat.sendEvent(chatId, imageURL);
+      const resp = await livechat.sendEvent(chatId, imageMain, true, imageType);
       await stats.save();
       // if (deactivateChatCheck) {
       //   await livechat.deactivateChat(chatId);

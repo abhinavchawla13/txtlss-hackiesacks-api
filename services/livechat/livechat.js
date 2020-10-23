@@ -64,7 +64,7 @@ exports.sendEvent = async (
         _.get(err, "response.data.error.message")
       );
     } else {
-      console.log("!!! Send event failed !!!");
+      console.log("!!! Send event failed !!! - no idea");
     }
   }
 };

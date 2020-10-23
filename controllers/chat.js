@@ -315,11 +315,11 @@ async function webhook(req, res) {
             currentGames[chatId]["order"][currentGames[chatId]["index"]];
           if (currentGameWin) {
             imageURL = constants.livechatCDNLinks[nextEmotion + "_correct"];
-            imageMain = "nextEmotion";
+            imageMain = nextEmotion;
             imageType = "correct";
           } else {
             imageURL = constants.livechatCDNLinks[nextEmotion + "_wrong"];
-            imageMain = "nextEmotion";
+            imageMain = nextEmotion;
             imageType = "wrong";
           }
         }

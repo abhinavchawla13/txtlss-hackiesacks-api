@@ -9,7 +9,7 @@ executeCronAwakeServer = async () => {
   try {
     const resp = await axios({
       method: "get",
-      url: "https://txtlss-hackiesacks.herokuapp.com/",
+      url: "https://txtlss-hackiesacks.herokuapp.com/"
     });
     console.log("CronService Executed", new Date().toISOString());
     return true;
@@ -36,7 +36,7 @@ executeCronUpdateLinks = async () => {
       }
     }
     let PromiseArray = [];
-    Object.keys(constants.livechatCDNLinks).forEach((key) => {
+    Object.keys(constants.livechatCDNLinks).forEach(key => {
       console.log("executeCronUpdateLinks - ", key);
       PromiseArray.push(
         new Promise(async (resolve, reject) => {
@@ -58,14 +58,14 @@ executeCronUpdateLinks = async () => {
 exports.init = async () => {
   try {
     console.log("Initializing CronService");
-    const job = new Cron.CronJob(
-      "*/25 * * * *",
-      () => executeCronAwakeServer(),
-      undefined,
-      true,
-      "America/New_York"
-    );
-    job.start();
+    // const job = new Cron.CronJob(
+    //   "*/25 * * * *",
+    //   () => executeCronAwakeServer(),
+    //   undefined,
+    //   true,
+    //   "America/New_York"
+    // );
+    // job.start();
 
     // const job2 = new Cron.CronJob(
     //   "0 0 */12 * * *",
